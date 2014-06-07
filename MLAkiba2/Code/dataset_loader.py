@@ -1,5 +1,6 @@
 from __future__ import division
 
+import sys
 import csv
 import json
 
@@ -7,7 +8,6 @@ import numpy as np
 from sklearn import datasets
 from matplotlib import pyplot, cm
 
-from scw import SCW1, SCW2
 
 digits = datasets.load_digits(2)
 images = digits.images.astype('f')
@@ -40,6 +40,7 @@ def load_from_csv(filename):
         image = map(float, row)
         images.append(image)
     return np.array(images), np.array(labels)
+
 
 def show_digits(images=images, (n_rows, n_columns)=(5, 5)):
     n_images = n_columns * n_rows
@@ -75,43 +76,21 @@ def to_bin_labels(labels, focused_labels):
     for i in range(len(labels)):
         if(labels[i] == focused_labels[0]):
             labels[i] = 1
-        if(labels[i] == focused_labels[1]):
+        elif(labels[i] == focused_labels[1]):
             labels[i] = -1
     return labels
 
 
 if(__name__ == '__main__'):
-    import sys
-    import time
-
-    #train_json, test_json = sys.argv[1:3]
-    train_csv, test_csv = sys.argv[1:3]
-
     n_trains = int(len(images)*0.8)
-    images = [image.reshape(-1).tolist() for image in images]
-    labels = to_bin_labels(labels, (1, 0))
-    export_as_csv(train_csv, images[:n_trains], labels[:n_trains])
-    export_as_csv(test_csv, images[n_trains:], labels[n_trains:])
-    #export_as_json(train_json, images[:n_trains], labels[:n_trains])
-    #export_as_json(test_json, images[n_trains:], labels[n_trains:])
+    train_json, test_json = sys.argv[1:3]
+    #train_csv, test_csv = sys.argv[1:3]
 
-    #X, y = load_from_json(train_json)
-    #test_digits, answers = load_from_json(test_json)
-   
-    X, y = load_from_csv(train_csv)
-    test_digits, answers = load_from_csv(test_csv)
-    scw = SCW2(len(X[0]), 1.0, 1.0)
-    t1 = time.time()
-    scw.fit(X, y)
-    t2 = time.time()
-    results = scw.predict(test_digits)
-    t3 = time.time() 
-    print("Fitting:    {}s".format(t2-t1))
-    print("Predicting: {}s".format(t3-t2))
-    
-    positive, negative = classify(test_digits, results)
-    print_accuracy(results, answers)
-    show_digits(positive)
-    show_digits(negative)
-    pyplot.show()
-
+    X, y = load_from_json(train_json)
+    test_digits, answers = load_from_json(test_json)
+    print("X:\n{}".format(X))
+    print("y:\n{}".format(y))
+    print("test_digits:\n{}".format(test_digits))
+    print("answers:\n{}".format(answers))
+    #X, y = load_from_csv(train_csv)
+    #test_digits, answers = load_from_csv(test_csv)
